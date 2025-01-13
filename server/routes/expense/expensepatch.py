@@ -1,7 +1,7 @@
 from datetime import datetime
 from models.expense import Expense
 from models.budget import Budget
-from models.__init__ import jwt_required, current_user, db, request, make_response, Resource
+from routes.__init__ import jwt_required, current_user, db, request, make_response, Resource
 
 
 class ExpensesPatch(Resource):

@@ -28,8 +28,8 @@ class Expense(db.Model, SerializerMixin):
         """
     
     # Relationships
-    budget = db.relationship("Budget", back_populates="expenses", cascade="all, delete-orphan")
-    transactions = db.relationship("Transaction", back_populates="expense", cascade="all, delete-orphan")
+    budget = db.relationship("Budget", back_populates="expenses")  
+    transactions = db.relationship("Transaction", back_populates="expense")
     
     # Serialize
     serialize_rules = ("-budget.expenses","-transactions.expense",)  
@@ -53,15 +53,21 @@ class Expense(db.Model, SerializerMixin):
         return amount
     
     @validates("date")
-    def validates_date(self, _, date):
-        if not isinstance(date, date):
+    def validates_date(self, _, expense_date):
+        # Ensure expense_date is an instance of datetime.date
+        if not isinstance(expense_date, date):
             raise TypeError("Date must be a valid date object.")
+        
         grace_period = datetime.today().date() - timedelta(days=30)
-        if date > datetime.today().date():
+        
+        # Compare correctly using 'date' objects
+        if expense_date > datetime.today().date():
             raise ValueError("Date cannot be in the future.")
-        if date < grace_period:
+        if expense_date < grace_period:
             raise ValueError("Date cannot be more than 30 days in the past.")
-        return date
+        
+        return expense_date
+
     
     @validates("budget_id")
     def validate_budget(self, _, budget):

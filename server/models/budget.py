@@ -7,7 +7,7 @@ class Budget(db.Model, SerializerMixin):
     __tablename__ = "budgets"
 
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String, unique=True)
+    name = db.Column(db.String)
     description = db.Column(db.String )
     total_amount = db.Column(db.Numeric(10, 2), default=Decimal('0.00'), nullable=False)
     start_date= db.Column(db.Date)
@@ -36,7 +36,8 @@ class Budget(db.Model, SerializerMixin):
 
     # Relationships
     budget_categories = db.relationship("BudgetCategories", back_populates="budget")
-    expense = db.relationship("Expense", back_populate="budget")
+    expenses = db.relationship("Expense", back_populates="budget", cascade="all, delete-orphan")
+    user = db.relationship('User', back_populates='budgets')
 
     # Serialize
     serialize_rules = ("-budget_categories",)

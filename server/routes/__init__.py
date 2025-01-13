@@ -15,6 +15,7 @@ from flask_jwt_extended import (
     get_jwt
 )
 from models.user import User
+from flask_bcrypt import Bcrypt
 
 @jwt.user_lookup_loader
 def user_lookup_callback(_jwt_header, jwt_data):
