@@ -1,21 +1,23 @@
-#!/usr/bin/env python3
+from werkzeug.exceptions import NotFound
+from config import app, api
 
-# Standard library imports
+# From my User Foler
+from routes.user.login import Login
+from routes.user.currentuser import CurrentUser
+from routes.user.currentuser import CurrentUserPatch
+from routes.user.googlesignin import GoogleAuth
+from routes.user.logout
+from routes.user.recoverpassword
+from routes.user.refresh
+from routes.user.signup
 
-# Remote library imports
-from flask import request
-from flask_restful import Resource
-
-# Local imports
-from config import app, db, api
-# Add your model imports
 
 
-# Views go here!
+# All Routes
 
-@app.route('/')
-def index():
-    return '<h1>Project Server</h1>'
+
+
+
 
 
 if __name__ == '__main__':
