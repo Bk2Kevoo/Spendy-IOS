@@ -1,8 +1,9 @@
 from models.__init__ import validates, db, SerializerMixin
 from sqlalchemy import Enum
 from decimal import Decimal
+from datetime import date as today_date
 from datetime import date
-from expense import Expense
+from models.expense import Expense
 
 class Transaction(db.Model, SerializerMixin):
     __tablename__ = "transactions"
@@ -37,38 +38,43 @@ class Transaction(db.Model, SerializerMixin):
 
     @validates("amount")
     def validates_amount(self, _, amount):
-        if not isinstance(amount, (Decimal, float, int)):
+        if not isinstance(amount, (Decimal, float)):
             raise TypeError("Amount must be a number")
         if amount <= 0:
             raise ValueError("Amount must be positive")
 
-        # Handle transaction logic for debit and credit
-        if self.transaction_type == 'debit':
-            # Ensure that debit does not exceed available balance in the expense
-            available_balance = self.expense.amount - sum(
-                t.amount for t in self.expense.transactions if t.transaction_type == 'debit'
-            )
-            if amount > available_balance:
-                raise ValueError("Debit amount exceeds available balance in the expense.")
-        elif self.transaction_type == 'credit':
-            # Ensure credit does not exceed the allocated budget of the expense
-            if amount > self.expense.amount:
-                raise ValueError("Credit amount cannot exceed the allocated budget of the expense.")
-        
+        # # Ensure the 'expense' is properly linked
+        # if self.expense is None:
+        #     raise ValueError(f"Transaction cannot be processed as Expense ID is invalid.")
+        # else:
+        #     available_balance = self.expense.amount - sum(
+        #         t.amount for t in self.expense.transactions if t.transaction_type == 'debit'
+        #     )
+        #     if self.transaction_type == 'debit' and amount > available_balance:
+        #         raise ValueError("Debit amount exceeds available balance in the expense.")
+        #     if self.transaction_type == 'credit' and amount > self.expense.amount:
+        #         raise ValueError("Credit amount cannot exceed the allocated budget of the expense.")
+
         return amount
 
     @validates("date")
-    def validates_date(self, _, date):
-        if not isinstance(date, date):
-            raise TypeError("Date must be a valid date object")
-        if date > date.today():
-            raise ValueError("Transaction date cannot be in the future.")
-        return date
+    def validates_date(self, _, transaction_date):
+        if not isinstance(transaction_date, date):
+            raise TypeError("Date must be a valid date object.")
+        
+        if transaction_date > today_date.today():  # Use today_date.today() to get current date
+            raise ValueError("Date cannot be in the future.")
+        
+        return transaction_date
 
-    @validates("expense_id")
-    def validates_expense_id(self, _, expense_id):
-        # Ensure that the expense_id exists in the database
-        expense = Expense.query.get(expense_id)
-        if not expense:
-            raise ValueError(f"Expense ID {expense_id} does not exist.")
-        return expense_id
+    # @validates("expense_id")
+    # def validates_expense_id(self, _, expense_id):
+    #     if expense_id is None:
+    #         raise ValueError("Expense ID cannot be None")
+    #     expense = Expense.query.get(expense_id)
+    #     if not expense:
+    #         raise ValueError(f"Expense ID {expense_id} does not exist.")
+    #     return expense_id
+
+
+

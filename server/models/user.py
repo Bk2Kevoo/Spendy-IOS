@@ -14,7 +14,7 @@ class User(db.Model, SerializerMixin):
     updated_at = db.Column(db.DateTime, onupdate=db.func.now())
 
     # Relationships
-    budgeting = db.relationship("Budget", back_populates="user")
+    budgets = db.relationship("Budget", back_populates="user", cascade="all, delete-orphan")
     savings = db.relationship("Saving", back_populates="user", cascade="all, delete-orphan") 
 
     # Serialize

@@ -19,4 +19,3 @@ class TransactionDelete(Resource):
 
         except Exception as e:
             return make_response({"error": str(e)}, 500)
-;
