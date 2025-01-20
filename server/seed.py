@@ -64,7 +64,7 @@ def seed_budgets(users, categories):
             end_date = start_date + timedelta(days=30)  # End date should be 30 days after start date
 
             # Generate fake data
-            name = fake.word() + " Budget"  # Generate a random word and append "Budget"
+            name = choice(budget_names)
             description = fake.sentence(nb_words=6)  # Generate a random sentence
             total_amount = float(round(fake.random_number(digits=3), 2))  # Ensure this is a float
             budget_type = choice(['monthly', 'overall'])  # Randomly choose 'monthly' or 'overall'
