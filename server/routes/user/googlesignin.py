@@ -43,7 +43,7 @@ class GoogleAuth(Resource):
 
             response_data = {
                 "message": "Logged in with Google",
-                "user": user.to_dict(),  # assuming you have a method to return user info without password
+                "user": user.to_dict(), 
                 "iniitial_sign_up": initial_sign_up
             }
             response = make_response(response_data, 200)
