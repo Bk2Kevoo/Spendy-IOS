@@ -8,13 +8,13 @@ class ResetPassword(Resource):
         # Get new password and token from request
         data = request.get_json()
         new_password = data.get("new_password")
-        reset_token = request.headers.get("Authorization", "").split(" ")[-1]  # Extract token safely
+        reset_token = request.headers.get("Authorization", "").split(" ")[-1]  
 
         if not reset_token or not new_password:
             return jsonify({"message": "New password and reset token are required"}), 400
 
         # Validate new_password (example: length check)
-        if len(new_password) < 8:
+        if len(new_password) < 7:
             return jsonify({"message": "Password must be at least 8 characters long"}), 400
 
         # Decode the token to get the user ID

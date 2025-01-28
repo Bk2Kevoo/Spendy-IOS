@@ -9,16 +9,14 @@ from models.user import User  # Assuming you have a User model
 
 class RequestPasswordReset(Resource):
     def post(self):
-        # Get the email from the request
         data = request.get_json()
         email = data.get("email")
         if not email:
             return jsonify({"message": "Email is required"}), 400
 
-        # Check if the email exists in the database
+
         user = User.query.filter_by(email=email).first()
         if not user:
-            # Return a generic success message to prevent email enumeration
             return jsonify({"message": "If the email exists, a reset link has been sent"}), 200
 
         # Create a password reset token
