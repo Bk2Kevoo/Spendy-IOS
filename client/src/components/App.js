@@ -7,12 +7,7 @@ export const AppContext = createContext();
 
 function App() {
 
-  const [data, setData] = useState({
-    expenses : [],
-    savings : [],
-    transactions : [],
-    budgets : [],
-  });
+  const [data, setData] = useState([]);
   const [error, setError] = useState(null);
 
   const fetchData = async (url, key) => {
