@@ -54,16 +54,14 @@ class Expense(db.Model, SerializerMixin):
     
     @validates("date")
     def validates_date(self, _, expense_date):
-        # Ensure expense_date is an instance of datetime.date
         if not isinstance(expense_date, date):
             raise TypeError("Date must be a valid date object.")
-        
         grace_period = datetime.today().date() - timedelta(days=30)
         
         # Compare correctly using 'date' objects
         if expense_date > datetime.today().date():
             raise ValueError("Date cannot be in the future.")
-        if expense_date < grace_period:
+        if datetime.today().date() < grace_period:
             raise ValueError("Date cannot be more than 30 days in the past.")
         
         return expense_date

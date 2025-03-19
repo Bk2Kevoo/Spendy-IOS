@@ -20,7 +20,6 @@ from models.budgetcategories import BudgetCategories
 
 fake = Faker()
 
-# Predefined data
 categories = [
     "Groceries", "Transport", "Utilities", "Entertainment", "Healthcare",
     "Education", "Savings", "Dining Out", "Shopping", "Miscellaneous"
@@ -30,6 +29,27 @@ budget_names = [
     "Monthly Essentials", "Travel Fund", "Emergency Savings", "Home Renovation", 
     "Healthcare Expenses", "Debt Payoff Plan", "First Home Purchase"
 ]
+
+budget_description_map = {
+    "Monthly Essentials": "Manage essential living expenses like rent, utilities, and food.",
+    "Travel Fund": "Set aside funds for upcoming travel expenses and adventures.",
+    "Emergency Savings": "Ensure financial security with an emergency savings plan.",
+    "Home Renovation": "Save for future home renovations and improvements.",
+    "Healthcare Expenses": "Plan ahead for unexpected medical costs and emergencies.",
+    "Debt Payoff Plan": "Prioritize paying off outstanding debts efficiently.",
+    "First Home Purchase": "Plan for large purchases by setting specific savings goals.",
+}
+
+expense_description_map = {
+    "Monthly Essentials": ["Groceries", "Rent payment", "Utility bill", "Internet bill", "Phone bill"],
+    "Travel Fund": ["Flight ticket", "Hotel stay", "Car rental", "Tour package", "Travel insurance"],
+    "Emergency Savings": ["Unexpected medical bill", "Car repair", "Home emergency repair", "Vet bill"],
+    "Home Renovation": ["New furniture", "Kitchen upgrade", "Bathroom renovation", "Painting walls"],
+    "Healthcare Expenses": ["Doctor visit", "Prescription medication", "Health insurance", "Physical therapy"],
+    "Debt Payoff Plan": ["Credit card payment", "Loan repayment", "Student loan installment"],
+    "First Home Purchase": ["Down payment", "Mortgage payment", "Property tax", "Home inspection"],
+}
+
 
 def seed_users(num_users=10): 
     users = []
@@ -46,7 +66,7 @@ def seed_categories():
     for category_name in categories:
         category = Category(
             name=category_name,
-            description=fake.sentence(nb_words=8),
+            description=choice(categories),
             is_default=True,
             created_at=fake.date_time_this_year(before_now=True),
             updated_at=fake.date_time_this_year(before_now=True),
@@ -61,18 +81,16 @@ def seed_budgets(users, categories):
     for user in users:
         for category in categories:
             start_date = date.today()
-            end_date = start_date + timedelta(days=30)  # End date should be 30 days after start date
-
-            # Generate fake data
+            end_date = start_date + timedelta(days=30) 
             name = choice(budget_names)
-            description = fake.sentence(nb_words=6)  # Generate a random sentence
-            total_amount = float(round(fake.random_number(digits=3), 2))  # Ensure this is a float
-            budget_type = choice(['monthly', 'overall'])  # Randomly choose 'monthly' or 'overall'
+            description = budget_description_map.get(name, "Plan your finances wisely.")
+            total_amount = float(round(fake.random_number(digits=3), 2)) 
+            budget_type = choice(['monthly', 'overall']) 
 
             budget = Budget(
                 name=name,
                 description=description,
-                total_amount=total_amount,  # Pass the float here
+                total_amount=total_amount,
                 start_date=start_date,
                 end_date=end_date,
                 user_id=user.id,
@@ -101,8 +119,8 @@ def seed_expenses(budgets, num_expenses=50):
     for _ in range(num_expenses):
         budget = choice(budgets)
         expense = Expense(
-            description=fake.sentence(nb_words=5),
-            amount=round(uniform(10.0, 500.0), 2),  # Random amount between 10 and 500
+            description = choice(expense_description_map.get(budget.name, ["Miscellaneous expense"])),
+            amount=round(uniform(10.0, 500.0), 2),  
             date=fake.date_this_year(before_today=True),
             budget_id=budget.id,
             created_at=fake.date_time_this_year(before_now=True),
@@ -115,72 +133,47 @@ def seed_expenses(budgets, num_expenses=50):
 
 def seed_transactions(expenses):
     for expense in expenses:
-        # Ensure the expense is valid and has an ID
         if not expense or not expense.id:
-            print(f"Invalid expense: {expense}")  # Debugging line
+            print(f"Invalid expense: {expense}")  
             raise ValueError(f"Expense with ID {expense.id} does not exist.")
-        
-        print(f"Seeding transaction for Expense ID: {expense.id}")  # Debugging line
-
-        # Randomize the transaction type between 'debit' and 'credit'
+        print(f"Seeding transaction for Expense ID: {expense.id}")  
         transaction_type = choice(['debit', 'credit'])
-        
-        # Generate a random transaction amount (for example between 5 and 200)
         transaction_amount = round(uniform(5.0, 200.0), 2)
-
-        # Create a transaction linked to the valid expense
         transaction = Transaction(
-            transaction_type=transaction_type,  # Randomized between 'debit' and 'credit'
-            amount=transaction_amount,  # Randomized amount
-            date=fake.date_this_year(before_today=True),  # Random transaction date
-            expense_id=expense.id  # Ensure that expense_id is set correctly
+            transaction_type=transaction_type, 
+            amount=transaction_amount, 
+            date=fake.date_this_year(before_today=True),
+            expense_id=expense.id
         )
         
         db.session.add(transaction)
-        
     db.session.commit()
 
 def seed_savings(users):
-    savings = []  # Initialize a list to store the saving objects
+    savings = [] 
 
-    current_year = datetime.now().year  # Get the current year
+    current_year = datetime.now().year 
 
     for user in users:
-        # Dynamically set month and year, ensuring the year is current or future
-        month = random.randint(1, 12)  # Random month between 1 and 12
-        year = random.choice([current_year, current_year + 1])  # Choose either the current year or the next year
-
-        # Generate random goal amount and current savings
-        goal_amount = round(random.uniform(1000.00, 10000.00), 2)  # Goal between $1,000 and $10,000
-        current_savings = round(random.uniform(0.00, goal_amount), 2)  # Current savings between 0 and goal amount
-        
-        # Ensure goal_amount and current_savings are Decimal
+        month = random.randint(1, 12) 
+        year = random.choice([current_year, current_year + 1]) 
+        goal_amount = round(random.uniform(1000.00, 10000.00), 2) 
+        current_savings = round(random.uniform(0.00, goal_amount), 2)
         goal_amount = Decimal(str(goal_amount))
         current_savings = Decimal(str(current_savings))
-        
-        # Check that month is an integer
         if not isinstance(month, int):
             raise TypeError(f"Invalid month: {month}, it must be an integer.")
-        
-        # Create Saving object with valid month, year, goal_amount, and current_savings
         saving = Saving(
             user_id=user.id,
-            month=month,  # Ensure this is an integer
-            year=year,    # Ensure this is an integer
-            goal_amount=goal_amount,  # Ensure it's a Decimal
-            current_savings=current_savings  # Ensure it's a Decimal
+            month=month,
+            year=year,
+            goal_amount=goal_amount,
+            current_savings=current_savings 
         )
-        
-        # Add the saving object to the list
         savings.append(saving)
-        
-        # Add the saving object to the session
         db.session.add(saving)
-    
-    # Commit the session to persist the data
     db.session.commit()
-
-    return savings  # Return the list of savings
+    return savings
 
 def run_seeds():
     print("Seeding database...")

@@ -8,14 +8,14 @@ class BudgetPost(Resource):
         try:
             data = request.get_json()
 
-            # Check if required fields are present
-            if "name" not in data or "amount" not in data:
-                return make_response({"error": "Name and amount are required."}, 400)
+            # # Check if required fields are present
+            if "name" not in data or "total_amount" not in data:
+                return make_response({"error": "Name and total_amount are required."}, 400)
 
             # Create a new budget instance for the logged-in user
             new_budget = Budget(
                 name=data["name"],
-                amount=data["amount"],
+                total_amount=data["total_amount"],
                 user_id=current_user.id
             )
 

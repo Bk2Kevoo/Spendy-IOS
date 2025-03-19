@@ -10,12 +10,12 @@ function HomePage() {
     // Give me Monthly Budget 
     // Month To Month Spending - Transactions
     // Make a chart representing those month to month spendings/ transactions
-    const [budegts, error] = useContext(AppContext)
+
+
+    const [budegts, fetchBudgets] = useContext(AppContext)
     const navigate = useNavigate()
 
-
-
-
+    
 
     return (
         <div className="homepage-box">

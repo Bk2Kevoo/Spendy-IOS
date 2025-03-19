@@ -112,8 +112,6 @@ api.add_resource(SavingsPatch, "/savings/<int:savings_id>/update")
 api.add_resource(SavingsDelete, "/savings/<int:savings_id>/delete")
 
 
-
-
 if __name__ == '__main__':
     app.run(port=5555, debug=True)
 
