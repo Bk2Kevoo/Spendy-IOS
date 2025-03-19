@@ -13,14 +13,12 @@ function App() {
   const fetchData = async (url, key) => {
     const apiUrl = "http://localhost:5555"
     try {
-        const response = await fetch(`${apiUrl}${url}`)
+        const response = await fetch(`${apiUrl}/${url}`)
         if (!response.ok) {
           throw new Error(`Error fetching data from ${url}`);
         }
         const data = await response.json();
-        setData((prevData) => ({
-          ...prevData, [key] : data,
-        }))
+        setData((prevData) => ({...prevData, [key] : data,}))
       } catch (err) {
         setError(err.message);
       }
@@ -31,7 +29,6 @@ function App() {
     fetchData("/expenses", "expenses");
     fetchData("/savings", "savings");
     fetchData("/budgets", "budgets");
-
 }, []);
 
 const value = useMemo(() => [data, error], [data, error]);

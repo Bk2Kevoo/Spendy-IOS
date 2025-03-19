@@ -68,3 +68,11 @@ header {
   text-align: center;
   margin: 0;
 }
+
+.Loader-hidden {
+  display: none;
+}
+
+.Loader-active {
+  display: block;
+}

@@ -7,14 +7,11 @@ class ExpensesDelete(Resource):
     @jwt_required()
     def delete(self, expense_id):
         try:
-            # Query the expense by expense_id and ensure the logged-in user owns the budget
             expense = Expense.query.filter_by(id=expense_id).first()
 
             if not expense:
                 return make_response({"error": "Expense not found."}, 404)
-
-            # Ensure the logged-in user is associated with the budget
-            budget = Budget.query.get(expense.budget_id)  # assuming Expense has a budget_id
+            budget = Budget.query.get(expense.budget_id) 
             if budget is None or budget.user_id != current_user.id:
                 return make_response({"error": "You are not authorized to delete this expense."}, 403)
 

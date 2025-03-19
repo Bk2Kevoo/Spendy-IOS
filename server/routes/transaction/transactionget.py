@@ -1,19 +1,16 @@
-from routes.__init__ import make_response, Resource, jwt_required
+from routes.__init__ import make_response, Resource, jwt_required, current_user
 from models.transaction import Transaction
+from models.expense import Expense
 
 
 class TransactionsGet(Resource):
     @jwt_required()
-    def get(self, expense_id):
+    def get(self):
         try:
-            transactions = Transaction.query.filter_by(expense_id=expense_id).all()
-
-            if not transactions:
-                return make_response({"message": "No transactions found for this expense."}, 404)
-
-            return make_response(
-                {"transactions": [transaction.to_dict() for transaction in transactions]},
-                200
-            )
+            expenses = Expense.query.filter_by(id=current_user.id).all()
+            if not expenses:
+                return make_response({"message": "No expesnes found for this user."}, 404)
+            transactions = Transaction.query.filter(Transaction.expense_id.in_([expense.id for expense in expenses])).all()
+            return make_response([transaction.to_dict() for transaction in transactions], 200)
         except Exception as e:
             return make_response({"error": str(e)}, 500)
