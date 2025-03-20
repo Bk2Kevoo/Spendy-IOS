@@ -1,47 +1,73 @@
-import React, { useEffect, useState, useMemo, createContext } from "react";
+import React, { useEffect, useState, createContext, useCallback } from "react";
 import Header from "./navigation/Header";
-import { Outlet } from "react-router";
+import { Outlet, useNavigate } from "react-router";
 import ScrollToTop from "./ScrollToTop";
+import toast from "react-hot-toast";
 
 export const AppContext = createContext();
 
-function App() {
+const getCookie = (name) => {
+  const value = `; ${document.cookie}`;
+  const parts = value.split(`; ${name}=`);
+  if (parts.length === 2) return parts.pop().split(";").shift();
+  return null;
+};
 
-  const [data, setData] = useState([]);
-  const [error, setError] = useState(null);
+const fetchCurrentUser = async (getCookie, navigate) => {
+  try {
+    const csrfToken = getCookie("csrf_access_token");
+    if (!csrfToken) return null; // Prevents fetching if no token exists
 
-  const fetchData = async (url, key) => {
-    const apiUrl = "http://localhost:5555"
-    try {
-        const response = await fetch(`${apiUrl}/${url}`)
-        if (!response.ok) {
-          throw new Error(`Error fetching data from ${url}`);
-        }
-        const data = await response.json();
-        setData((prevData) => ({...prevData, [key] : data,}))
-      } catch (err) {
-        setError(err.message);
-      }
+    const response = await fetch("/api/v1/current-user", {
+      headers: {
+        "X-CSRF-TOKEN": csrfToken,
+      },
+    });
+
+    if (response.ok) return await response.json();
+
+    // Try refreshing the token if the first request fails
+    const refreshToken = getCookie("csrf_refresh_token");
+    if (!refreshToken) return null;
+
+    const refreshResponse = await fetch("/api/v1/refresh", {
+      headers: {
+        "X-CSRF-TOKEN": refreshToken,
+      },
+    });
+
+    if (refreshResponse.ok) return await refreshResponse.json();
+
+    return null;
+  } catch (error) {
+    toast.error(error.message || "An error has occurred. Try again later.");
+    navigate("/register");
+    return null;
   }
+};
+
+function App() {
+  const [currentUser, setCurrentUser] = useState(null);
+  const navigate = useNavigate();
+
+  const fetchUserData = useCallback(async () => {
+    const user = await fetchCurrentUser(getCookie, navigate);
+    if (user) setCurrentUser(user);
+  }, [navigate]);
 
   useEffect(() => {
-    fetchData("/transactions", "transactions");
-    fetchData("/expenses", "expenses");
-    fetchData("/savings", "savings");
-    fetchData("/budgets", "budgets");
-}, []);
+    fetchUserData();
+  }, [fetchUserData]);
 
-const value = useMemo(() => [data, error], [data, error]);
+  const updateUser = (value) => setCurrentUser(value);
 
-return (
-  <AppContext.Provider value={value}>
-      <div>
-          <ScrollToTop />
-          <Header />
-          <Outlet />
-      </div>
-  </AppContext.Provider>
-);
+  return (
+    <AppContext.Provider value={{ getCookie }}>
+      <Header />
+      <ScrollToTop />
+      <Outlet context={{ currentUser, updateUser, getCookie }} />
+    </AppContext.Provider>
+  );
 }
 
 export default App;

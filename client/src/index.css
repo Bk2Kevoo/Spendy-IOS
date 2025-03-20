@@ -3,7 +3,7 @@
   line-height: 1.5;
   font-weight: 400;
   color-scheme: light dark;
-  background-color: white;
+  background-color: rgba(255, 255, 255, 0.637);
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
@@ -12,7 +12,8 @@
 }
 body {
   margin: 0;
-  background-color: white;
+  background-color: rgba(255, 255, 255, 0.288);
+  grid-template-columns: repeat(3, 1fr); 
   display: flex;
   flex-direction: column;
   place-items: center;
@@ -75,4 +76,127 @@ header {
 
 .Loader-active {
   display: block;
+}
+
+.landing-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100vh;
+  gap: 2%;
+  margin-top: 0;
+  padding: 0;
+  box-sizing: border-box;
+  flex-wrap: wrap;
+}
+
+.video-money {
+  width: 45%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.video-money img {
+  width: 100%;
+  max-width: 600px;
+  height: auto;
+  object-fit: contain;
+}
+
+.landing-information {
+  width: 45%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  text-align: left;
+}
+
+.landing-text {
+  font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+  font-size: 30px;
+  color: black;
+  line-height: 1.5;
+  max-width: 100%;
+}
+
+/* Media Query for smaller screens */
+@media (max-width: 768px) {
+  .landing-container {
+    flex-direction: column;
+    gap: 20px;
+    margin-top: 1;
+  }
+
+  .video-money, .landing-information {
+    width: 80%;
+  }
+
+  .landing-text {
+    font-size: 18px;
+    text-align: center;
+  }
+
+  .video-money img {
+    max-width: 90%;
+  }
+}
+
+
+.register-box, .login-box, .middle-or {
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.container {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  justify-items: center;
+  align-items: center;
+  width: 100%;
+  max-width: 400px;
+  margin: 0 auto;
+}
+
+.register-box, .login-box {
+  margin: 10px 0;
+}
+
+/* Buttons for Register and Login */
+#register-button, #login-button {
+  width: auto;
+  padding: 0.75rem 1.5rem; /* Scalable padding */
+  font-size: 1.2rem; /* Scalable font size */
+  background-color: #4caf50;
+  color: white;
+  border: none;
+  cursor: pointer;
+  border-radius: 5px;
+  transition: background-color 0.3s;
+  margin: 0 auto;
+}
+
+.middle-or {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #555;
+  margin: 10px 0;
+}
+
+/* Button Hover Effect */
+#register-button:hover, #login-button:hover {
+  background-color: #45a049;
+}
+
+/* Media Query for buttons in smaller screens */
+@media (max-width: 768px) {
+  #register-button, #login-button {
+    font-size: 1rem; /* Smaller font size for smaller screens */
+    padding: 0.5rem 1rem; /* Adjust padding */
+  }
+
+  .middle-or {
+    font-size: 1.2rem; /* Smaller font size for "or" text */
+  }
 }

@@ -4,7 +4,6 @@ import Loader from "react-loaders"
 
 // This has to be where my CRUD for my BUDGETS are going to be POST, PATCH, DELETE
 function BudgetProvider() {
-
     const [budgets, setBudgets] = useState([]);
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState(null)
@@ -15,7 +14,7 @@ function BudgetProvider() {
         try {
             const response = await fetch("api/v1/budgets")
             if(!response.ok) {
-                toast.error("Failed to Fetch api/v1/budgets")
+                toast.error("Failed to Fetch Budgets")
             }
             const data = await response.json();
             setBudgets(data)
@@ -86,14 +85,55 @@ function BudgetProvider() {
         return <p>Error: {error.message}</p>
     }
 
-    const deleteBudget = async () => {     
+    const deleteBudget = async (budgetId) => {
+        setLoading(true)     
         try{
-            const response = await fetch(`/api/v1/budgets`)
+            const token = getCookie("authToken");
+            const csrfToken = getCookie("csrf_access_token");
+            const response = await fetch(`api/v1/budgets/`, {
+                method: "DELETE",
+                headers: {
+                    "Authorization": `Bearer ${token}`, 
+                    "Content-Type": "application/json",
+                    "X-CSRF-TOKEN": csrfToken,
+                },
+                credentials: "include",
+            })
+            if(!response.ok) {
+                throw new Error(` HTTP error status: ${response.statuts} `)
+            }
+            setBudgets((prevBudgets) => prevBudgets.filter((budget) => budget.id !== budgetId))
+            toast.success("Deleted Budget Successully.")
+        } catch (error) {
+            toast.error('Failed to Delete Budget')
+        } finally {
+            setLoading(false);
         }
     }
 
+    const getBudgetsId = async (budgetsId) => {
+        try {
+          const response = await fetch(`api/v1/budgets/${budgetsId}`, {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+            },
+          });
+      
+          if (!response.ok) {
+            throw new Error(`Failed to fetch expense: ${response.statusText}`);
+          }
+          const budget = await response.json();
+          return budget;
+        } catch (error) {
+          console.error("Error fetching expense by ID:", error);
+          throw error;
+        }
+      };
+
+
     return (
-        <BudgetProvider value={{budgets, fetchBudgets, addBudget, editBudget}}>
+        <BudgetProvider value={{budgets, fetchBudgets, addBudget, editBudget,getBudgetsId, deleteBudget}}>
             {/* value ={fetchBudgets, budgets, editBudgets, deleteBudgets } */}
         </BudgetProvider>
     )
