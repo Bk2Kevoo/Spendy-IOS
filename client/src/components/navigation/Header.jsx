@@ -9,14 +9,15 @@ function Header() {
         <header>
             <h1 className="logo-name">
                 <span className="logo" role="img"></span>
-                Spendy 
+                {/* <NavLink to="/register" className={({ isActive }) => isActive ? "active logo-link" : "logo-link"}>Spendy</NavLink>   */}
+                Spendy
             </h1>
             <nav className="home-link">
                 <NavLink to="/home" className={({ isActive }) => isActive ? "active home-link" : "home-link"}>Home</NavLink>                
                 <FaHome />
             </nav>
             <nav className="about-link">
-                <NavLink to="/" className={({ isActive }) => isActive ? "active about-link" : "about-link"}>About</NavLink>
+                <NavLink to="/about" className={({ isActive }) => isActive ? "active about-link" : "about-link"}>About</NavLink>
                 <IoIosInformationCircle />
             </nav>
             <nav className="savings-link">
